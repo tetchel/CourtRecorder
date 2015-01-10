@@ -70,11 +70,6 @@ public class CourtPanel extends JPanel
         bgr.drawImage(court_image, 0, 0, null);
         bgr.dispose();
 
-        /*setLayout(new FlowLayout());
-        add(cc);
-        setSize(this.getPreferredSize());
-        revalidate();*/
-
         setPreferredSize(new Dimension(width, height));
 
         addMouseListener(new MouseAdapter() {
@@ -108,10 +103,7 @@ public class CourtPanel extends JPanel
                 }
             }
 
-            if(game_secs < 10)
-                gametime = "Q" + quarter + " " + game_mins + ":0" + game_secs;
-            else
-                gametime = "Q" + quarter + " " + game_mins + ":" + game_secs;
+            updateGameTime();
 
             CourtConsole.TimerPanel.timelabel.setText(gametime);
 
@@ -129,6 +121,13 @@ public class CourtPanel extends JPanel
         });
 
         clickTimer.start();
+    }
+
+    private static void updateGameTime() {
+        if(game_secs < 10)
+            gametime = "Q" + quarter + " " + game_mins + ":" + "0" + game_secs;
+        else
+            gametime = "Q" + quarter + " " + game_mins + ":" + game_secs;
     }
 
     private static void stopClock() {
@@ -225,7 +224,6 @@ public class CourtPanel extends JPanel
     /*
     Returns a play with the correct play type as parsed from input.
     Returns null if input is bad, null plays will not be recorded.
-    this method is >200 lines..
      */
     private static Play parsePlay(Play p, String in) {
 
@@ -299,29 +297,43 @@ public class CourtPanel extends JPanel
                 break;
             //shot
             case 's':
-                out = out + "Offensive Player #" + onum;
-                    if(in.substring(start_index-1).contains("o")) {
-                        out = out + " makes";
-                        p.setType("Made shot");
-                    }
-                    else if(in.substring(start_index-1).contains("x")) {
-                        out = out + " misses";
-                        p.setType("Missed shot");
-                    }
-                    else {
-                        cc.output("Error: " + second + " must be o or x for shots. Event not recorded.");
-                        return null;
-                    }
+                if(!onum.equals(""))
+                    out = out + "Offensive Player #" + onum;
+                else
+                    out = out + "Offense";
 
-                    if(first == 'u' ) {
-                        out = out + " an uncontested shot";
-                    }
-                    else if(first == 'c' ) {
-                        out = out + " a contested shot";
-                    }
-                    else if(first == 'b' ) {
-                        out = out + " was blocked";
-                    }
+                if(in.substring(start_index-1).contains("o")) {
+                    out = out + " makes";
+                    p.setType("Made shot");
+                }
+                else if(in.substring(start_index-1).contains("x")) {
+                    out = out + " misses";
+                    p.setType("Missed shot");
+                }
+                else {
+                    cc.output("Error: " + second + " must be o or x for shots. Event not recorded.");
+                    return null;
+                }
+                /*
+                if(first == 'u' ) {
+                    out = out + " an uncontested shot";
+                }
+                else if(first == 'c' ) {
+                    out = out + " a contested shot";
+                }
+                else if(first == 'b' ) {
+                    out = out + " was blocked";
+                }*/
+
+                if(in.substring(start_index-2).contains("u")) {
+                    out = out + " an uncontested shot";
+                }
+                else if(in.substring(start_index-2).contains("c")) {
+                    out = out + " a contested shot";
+                }
+                else if(in.substring(start_index-2).contains("b")) {
+                    out = out + " was blocked";
+                }
 
                 break;
             //turnover
@@ -425,9 +437,6 @@ public class CourtPanel extends JPanel
             else if (ch == 'i') {
                 out = out + " against # " + dnum;
             }
-            else if (ch == 'q') {
-
-            }
             else {
                 if(!record_unknown) {
                     out = "Play " + in.substring(0, in.length() - 1) + " not recognized and not recorded.";
@@ -497,7 +506,9 @@ public class CourtPanel extends JPanel
 
     /*
         @author Tim Etchells
-        Represents a JComponent which is composed of two inner components - a scroll pane to show output and a text field
+        Represents a JComponent which is composed of four inner components - a scroll pane to show output and a text field,
+        also a label to display time
+        and a panel to display a series of buttons
         for the user to type in. Clicking on the picture will grab the input from the text field.
      */
     protected static class CourtConsole extends JPanel {
@@ -627,13 +638,12 @@ public class CourtPanel extends JPanel
                         if(slash != -1) {
                             newq = Integer.parseInt(newtime.substring(0,slash));
 
-
                             newmins = Integer.parseInt(newtime.substring(slash+1, colon));
                         }
                         else
                             newmins = Integer.parseInt(newtime.substring(0, colon));
 
-                        newsecs = Integer.parseInt(newtime.substring(colon + 1));
+                        newsecs = Integer.parseInt(newtime.substring(colon+1));
 
                         if(newq > 4 || newq < 1 || newmins > 10 || newmins < 0 || newsecs > 59 || newsecs < 0)
                             throw new NumberFormatException();
@@ -641,7 +651,8 @@ public class CourtPanel extends JPanel
                         quarter = newq;
                         game_mins = newmins;
                         game_secs = newsecs;
-                        gametime = "Q" + quarter + " " + game_mins + ":" + game_secs + "0";
+
+                        updateGameTime();
                         CourtConsole.TimerPanel.timelabel.setText(gametime);
                     } catch ( NumberFormatException | StringIndexOutOfBoundsException ex ) {
                         cc.output("Invalid time entered");
