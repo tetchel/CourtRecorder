@@ -9,7 +9,8 @@ public class Play
     private int y;
     private String  type = "",
                     oplayer = "",
-                    dplayer = "";
+                    dplayer = "",
+                    oteam = "";
 
     private boolean clickable = true;
 
@@ -58,5 +59,14 @@ public class Play
 
     public String getDPlayer() {
         return this.dplayer;
+    }
+
+    // temporary manual input of team
+    public void setOTeam(String s) {
+        this.oteam = s;
+    }
+
+    public String getOTeam() {
+        return this.oteam;
     }
 }

@@ -138,7 +138,7 @@ public class CourtPanel extends JPanel
 
     private void initializeLogFile()
     {
-        final String FIRST_LINE = "Time, Game Time, X, Y, Play Type, Offense, Defense";
+        final String FIRST_LINE = "Time, Game Time, X, Y, Play Type, Offensive Team, Offense, Defense";
 
         PrintWriter pw = null;
         BufferedReader br = null;
@@ -187,9 +187,9 @@ public class CourtPanel extends JPanel
         Calendar cal = Calendar.getInstance();
 
         if(p.getX() == -1)
-            pw.printf(" %s, %s, , , %s, %s, %s\n", gametime, tf.format(cal.getTime()), p.getType(), p.getOPlayer(), p.getDPlayer());
+            pw.printf(" %s, %s, , , %s, %s, %s, %s\n", gametime, tf.format(cal.getTime()), p.getType(), p.getOTeam(), p.getOPlayer(), p.getDPlayer());
         else
-            pw.printf(" %s, %s, %d, %d, %s, %s, %s\n", gametime, tf.format(cal.getTime()), p.getX(), p.getY(), p.getType(), p.getOPlayer(), p.getDPlayer());
+            pw.printf(" %s, %s, %d, %d, %s, %s, %s, %s\n", gametime, tf.format(cal.getTime()), p.getX(), p.getY(), p.getType(), p.getOTeam(), p.getOPlayer(), p.getDPlayer());
 
         pw.flush();
         pw.close();
@@ -263,6 +263,25 @@ public class CourtPanel extends JPanel
 
         switch (ch) {
             //tipoff
+
+            // offensive team
+            case 'q':
+                //if(onum.equals("")) {
+                    if(first == 'g') {
+                        out = out + "Guelph:";
+                        p.setOTeam("Guelph");
+                    }
+                    else if (first == 'o') {
+                        out = out + "Opp:";
+                        p.setOTeam("Opp");
+                    }
+                /*
+                else{
+                    cc.output("Error: Offensive Player # should excluded when inputting offensive team");
+                }
+                */
+                break;
+
             case 'i':
                 if(first == 'l') {
                     out = out + onum + " lost the tipoff";
@@ -392,7 +411,7 @@ public class CourtPanel extends JPanel
                         out = out + "Turnover forced by #" + dnum;
                 }
             }
-            //foul - player BEFORE \ WAS FOULED, player AFTER \ WAS THE FOULER
+            //foul - player BEFORE / WAS FOULED, player AFTER / WAS THE FOULER
             else if (ch == 'p') {
                 if(!onum.equals(dnum))
                     out = onum + " was fouled by #" + dnum;
@@ -405,6 +424,9 @@ public class CourtPanel extends JPanel
             }
             else if (ch == 'i') {
                 out = out + " against # " + dnum;
+            }
+            else if (ch == 'q') {
+
             }
             else {
                 if(!record_unknown) {
