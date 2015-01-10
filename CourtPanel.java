@@ -30,7 +30,7 @@ public class CourtPanel extends JPanel
     //t is the number of swing timer ticks
     //the other 3 are self explainatory
     private static int  t         = 0,
-                        game_mins = 12,
+                        game_mins = 10,
                         game_secs = 0,
                         quarter   = 1;
     private static String gametime = "Q" + quarter + " " + game_mins + ":" + game_secs + "0";
@@ -98,7 +98,7 @@ public class CourtPanel extends JPanel
                     if(quarter < 4) {
                         quarter++;
                         game_secs = 0;
-                        game_mins = 12;
+                        game_mins = 10;
                         stopClock();
                     }
                     else {
@@ -280,47 +280,29 @@ public class CourtPanel extends JPanel
                 break;
             //shot
             case 's':
-                out = out + "Player " + onum + " took a shot ";
-                if(first == 'u' ) {
-                    out = out + "that was uncontested ";
+                out = out + "Offensive Player #" + onum;
                     if(in.substring(start_index-1).contains("o")) {
-                        out = out + "and scored ";
-                        p.setType("Uncontested basket");
+                        out = out + " makes";
+                        p.setType("Made shot");
                     }
                     else if(in.substring(start_index-1).contains("x")) {
-                        out = out + "and missed ";
-                        p.setType("Uncontested miss");
+                        out = out + " misses";
+                        p.setType("Missed shot");
                     }
                     else {
                         cc.output("Error: " + second + " must be o or x for shots. Event not recorded.");
                         return null;
                     }
-                }
-                else if(first == 'c') {
-                    out = out + "that was contested ";
-                    if(second == 'o') {
-                        out = out + "and scored ";
-                        p.setType("Contested basket");
-                    }
-                    else if(second == 'x') {
-                        out = out + "and missed ";
-                        p.setType("Contested miss");
-                    }
-                    else {
-                        cc.output("Error: " + second + " must be o or x for shots. Event not recorded.");
-                        return null;
-                    }
-                }
 
-                else if(first == 'b') {
-                    out = out + "that was blocked ";
-                    //they always miss if it's blocked, duh
-                    p.setType("Blocked shot");
-                }
-                else {
-                    cc.output("Error: " + first + " must be u, c or b for shots. Event not recorded.");
-                    return null;
-                }
+                    if(first == 'u' ) {
+                        out = out + " an uncontested shot";
+                    }
+                    else if(first == 'c' ) {
+                        out = out + " a contested shot";
+                    }
+                    else if(first == 'b' ) {
+                        out = out + " was blocked";
+                    }
 
                 break;
             //turnover
@@ -388,11 +370,11 @@ public class CourtPanel extends JPanel
             //shot that was blocked or contested or not contested
             if (ch == 's') {
                 if(first == 'u')
-                    out = out + "\n" + "Shot uncontested by " + dnum;
+                    out = out + "\n" + "Shot uncontested by Defensive Player # " + dnum;
                 else if(first == 'c')
-                    out = out + "\n" + "Shot contested by " + dnum;
+                    out = out + "\n" + "Shot contested by Defensive Player # " + dnum;
                 else if(first == 'b')
-                    out = out + "\n" + "Shot blocked by " + dnum;
+                    out = out + "\n" + "Shot blocked by Defensive Player # " + dnum;
             }
             //turnover that was forced ONLY
             //HERE WE ASSUME that if there is a defensive player, the turnover WAS FORCED REGARDLESS OF IF F OR U IS PRESENT
@@ -586,24 +568,24 @@ public class CourtPanel extends JPanel
         }
 
         private static class ButtonPanel extends JComponent {
-            private final static JButton start_stopb = new JButton("Start");
+            private final static JButton start_stopb = new JButton("Start Time");
             private final static JButton update_timeb = new JButton("Update Time");
 
             public ButtonPanel(CourtConsole cc) {
                 start_stopb.addActionListener(e -> {
                     if(timer.isRunning()) {
                         timer.stop();
-                        start_stopb.setText("Start");
+                        start_stopb.setText("Start Time");
                     }
                     else {
                         timer.start();
-                        start_stopb.setText("Stop");
+                        start_stopb.setText("Stop Time");
                     }
                 });
 
                 update_timeb.addActionListener(e -> {
                     timer.stop();
-                    start_stopb.setText("Start");
+                    start_stopb.setText("Start Time");
 
                     JOptionPane command_pane = new JOptionPane();
                     command_pane.setPreferredSize(new Dimension(160, 90));
@@ -631,7 +613,7 @@ public class CourtPanel extends JPanel
 
                         newsecs = Integer.parseInt(newtime.substring(colon + 1));
 
-                        if(newq > 4 || newq < 1 || newmins > 12 || newmins < 0 || newsecs > 59 || newsecs < 0)
+                        if(newq > 4 || newq < 1 || newmins > 10 || newmins < 0 || newsecs > 59 || newsecs < 0)
                             throw new NumberFormatException();
 
                         quarter = newq;
